@@ -1,0 +1,34 @@
+# Create an OSEv3 group that contains the masters and nodes groups
+[OSEv3:children]
+masters
+nodes
+
+# Set variables common for all OSEv3 hosts
+[OSEv3:vars]
+# SSH user, this user should allow ssh based auth without requiring a password
+ansible_ssh_user=root
+openshift_use_dnsmasq=false
+openshift_dns_ip=8.8.8.8
+
+# If ansible_ssh_user is not root, ansible_sudo must be set to true
+#ansible_sudo=true
+
+# To deploy origin, change deployment_type to origin
+deployment_type=openshift-enterprise
+
+osm_default_subdomain=apps.testv3.osecloud.com
+osm_default_node_selector=region=primary
+
+# enable htpasswd authentication
+openshift_master_identity_providers=[{'name': 'htpasswd_auth', 'login': 'true', 'challenge': 'true', 'kind': 'HTPasswdPasswordIdentityProvider', 'filename': '/etc/openshift/openshift-passwd'}]
+
+# host group for masters
+[masters]
+master.testv3.osecloud.com
+
+# host group for nodes, includes region info
+[nodes]
+master.testv3.osecloud.com openshift_node_labels="{'region': 'infra', 'zone': 'default'}" openshift_public_hostname=master.testv3.osecloud.com openshift_hostname=172.18.52.24 openshift_scheduleable=true
+172.18.52.39 openshift_node_labels="{'region': 'primary', 'zone': 'east'}" 
+172.18.52.17 openshift_node_labels="{'region': 'primary', 'zone': 'west'}" 
+172.18.52.26 openshift_node_labels="{'region': 'primary', 'zone': 'west'}" 
